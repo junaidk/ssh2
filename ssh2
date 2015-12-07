@@ -15,6 +15,9 @@ parser.add_option("-x", "--bust-cache", action="store_true",
 parser.add_option("-u", "--user", action="store",
                   dest="user", default="ubuntu",
         help="provide user (default: ubuntu)")
+parser.add_option("-i", "--private-key", action="store",
+					dest="private_key", default="",
+	help="path to private key")
 (options, args) = parser.parse_args()
 
 num = ''
@@ -73,11 +76,33 @@ while not ok or not num:
         print "\nExiting..."
         exit()
 
+user = ''
+if len(args) == 0 :
+	user = raw_input("\nUser name [" + options.user + "]? ") 
+	if not user:
+		user = options.user
+else :
+	user = options.user
+
+private_key = ''
+if len(args) == 0 :
+	private_key = raw_input("\nPrivate key [none]? ") 
+	if not private_key:
+		private_key = options.private_key
+else :
+	private_key = options.private_key		
+
 with open(cache_file_num, 'w') as f:
 	f.write(str(num))
 
 instance = all_instances[num - 1]
 dns = instance['PublicDnsName']
 
+if len(private_key) != 0:
+	private_key_arg = '-i '+ private_key + ' '
+else :
+	private_key_arg = ""
+
 print "\nConnecting to", extract_name(instance), dns
-os.system('ssh ' + options.user + '@' + dns)
+#print 'ssh ' + private_key_arg +  user + '@' + dns
+os.system('ssh ' + private_key_arg +  user + '@' + dns)
